@@ -1,0 +1,13 @@
+[project]
+name = "vishwas"
+version = "0.0.1"
+description = "The Bust Atlas of India - forecast bust detection for medium-range ensembles (SIH26079)"
+requires-python = ">=3.12,<3.13"
+
+[tool.pytest.ini_options]
+testpaths = ["pipeline/tests", "backend/tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

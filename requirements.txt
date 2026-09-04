@@ -1,0 +1,15 @@
+# pipeline (laptop)
+pandas>=2.2
+pyarrow>=16
+numpy>=1.26
+lightgbm>=4.3
+scikit-learn>=1.5
+pydantic>=2.7
+matplotlib>=3.9
+pytest>=8
+ruff>=0.5
+# extraction (Colab installs these itself; listed for local dev)
+xarray>=2024.6
+zarr>=2.18,<3
+gcsfs>=2024.6
+dask[array]>=2024.6

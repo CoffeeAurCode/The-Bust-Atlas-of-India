@@ -52,7 +52,10 @@ STORAGE = {"token": "anon"}
 
 
 def open_zarr(path: str) -> xr.Dataset:
-    return xr.open_zarr(path, storage_options=STORAGE, consolidated=True)
+    # decode_timedelta=False keeps prediction_timedelta as the raw integer index (hours on
+    # WB2). Newer xarray (Colab, Sep 2026) otherwise decodes it to timedelta64[ns], and the
+    # two environments must behave identically.
+    return xr.open_zarr(path, storage_options=STORAGE, consolidated=True, decode_timedelta=False)
 
 
 def to_lat_lon(da: xr.DataArray) -> xr.DataArray:

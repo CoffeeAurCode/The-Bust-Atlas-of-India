@@ -41,9 +41,9 @@ If Colab disconnects: reconnect and re-run the extract cell; it resumes from the
             cell("markdown", "## Sanity check: the archives open and a Z500 field over India looks like weather\n"),
             cell("code", '''import xarray as xr, numpy as np, matplotlib.pyplot as plt
 S = {"token": "anon"}
-ens = xr.open_zarr("gs://weatherbench2/datasets/ifs_ens/2018-2022-64x32_equiangular_conservative.zarr", storage_options=S)
+ens = xr.open_zarr("gs://weatherbench2/datasets/ifs_ens/2018-2022-64x32_equiangular_conservative.zarr", storage_options=S, decode_timedelta=False)
 print("levels:", ens.level.values, "| members:", ens.sizes["number"], "| lead index (hours):", ens.prediction_timedelta.values[:6], "...")
-z = ens.geopotential.sel(level=500, time="2022-07-12T00", prediction_timedelta=120).isel(number=0).load()
+z = ens.geopotential.sel(level=500, time="2022-07-12T00").isel(prediction_timedelta=20, number=0).load()  # index 20 = 120 h = Day 5
 z.transpose("latitude", "longitude").sel(latitude=slice(0, 45), longitude=slice(55, 110)).plot()
 plt.title("IFS ENS member 0, Z500, init 2022-07-12 00Z, Day 5"); plt.show()
 '''),

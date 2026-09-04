@@ -87,8 +87,8 @@ a { color: inherit; }
 .map .sea-region { stroke: var(--ink); stroke-opacity: 0.25; stroke-width: 0.7; stroke-dasharray: 3 3; cursor: pointer; transition: fill 0.5s var(--ease); }
 .map .sea-region:hover, .map .sea-region.is-selected { stroke-opacity: 0.9; stroke-dasharray: none; }
 .map .flag { fill: url(#hatch); pointer-events: none; }
-.map .rlabel { font-family: var(--font-ui); font-size: 10.5px; fill: var(--ink); fill-opacity: 0.85; pointer-events: none; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
-.map .rlabel .val { font-family: var(--font-mono); }
+.map .rlabel { font-family: var(--font-ui); font-size: 15px; font-weight: 500; fill: var(--ink); fill-opacity: 0.85; pointer-events: none; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
+.map .rlabel .val { font-family: var(--font-mono); font-size: 14px; font-weight: 400; }
 
 .tip { position: absolute; pointer-events: none; z-index: 5; background: var(--ink); color: var(--bg); padding: 8px 10px; border-radius: var(--radius); font-size: 12px; line-height: 1.35; box-shadow: var(--shadow); max-width: 240px; transform: translate(12px, 12px); }
 .tip b { font-weight: 500; }

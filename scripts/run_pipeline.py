@@ -44,7 +44,7 @@ FLAG_THRESHOLD = 0.15
 SOURCE_LABELS = {
     "ifs_ens": ("ECMWF IFS ENS (WeatherBench 2 archive)", 50),
     "fgn": ("Google WeatherNext 2 (WeatherBench 2 archive)", 64),
-    "synthetic": ("SYNTHETIC DATA — NOT REAL", 50),
+    "synthetic": ("Synthetic data, not real", 50),
 }
 
 

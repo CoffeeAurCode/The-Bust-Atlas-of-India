@@ -49,7 +49,7 @@ def main() -> None:
         d = pd.Timestamp(r.init)
         cases.append({
             "id": f"bust-{key(r.init)}-{r.region}",
-            "title": f"{label}, {nice(d)} — the Day {int(r.lead_days)} forecast that busted",
+            "title": f"{label}, {nice(d)}: the Day {int(r.lead_days)} forecast that busted",
             "kind": "bust", "init": key(r.init), "region": r.region, "lead": int(r.lead_days),
             "prob": round(float(r.p_model), 3),
             "narrative": {
@@ -68,7 +68,7 @@ def main() -> None:
     d = pd.Timestamp(r.init)
     cases.append({
         "id": f"verified-{key(r.init)}-{r.region}",
-        "title": f"{label}, {nice(d)} — a Day {int(r.lead_days)} forecast worth trusting",
+        "title": f"{label}, {nice(d)}: a Day {int(r.lead_days)} forecast worth trusting",
         "kind": "verified", "init": key(r.init), "region": r.region, "lead": int(r.lead_days),
         "prob": round(float(r.p_model), 3),
         "narrative": {

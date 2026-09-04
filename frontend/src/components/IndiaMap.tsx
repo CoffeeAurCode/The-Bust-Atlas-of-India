@@ -35,9 +35,10 @@ export function IndiaMap({ geo, meta, values, selected, onSelect, showLabels = t
   const ramp = useMemo(() => riskRamp(), [themeTick]);
 
   const { path, projection } = useMemo(() => {
+    // d3-geo wants exterior rings wound clockwise; a counter-clockwise box would fit the whole globe.
     const projection = geoMercator().fitExtent([[24, 24], [W - 24, H - 24]], {
       type: "FeatureCollection",
-      features: [{ type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [[[66, 5], [98, 5], [98, 38], [66, 38], [66, 5]]] } }],
+      features: [{ type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [[[66, 5], [66, 38], [98, 38], [98, 5], [66, 5]]] } }],
     } as never);
     return { path: geoPath(projection), projection };
   }, []);
@@ -47,7 +48,7 @@ export function IndiaMap({ geo, meta, values, selected, onSelect, showLabels = t
 
   const boxPath = (box: number[]) => {
     const [lat0, lat1, lon0, lon1] = box;
-    const pts = [[lon0, lat0], [lon1, lat0], [lon1, lat1], [lon0, lat1]].map(([lo, la]) => projection([lo, la]) as [number, number]);
+    const pts = [[lon0, lat0], [lon0, lat1], [lon1, lat1], [lon1, lat0]].map(([lo, la]) => projection([lo, la]) as [number, number]);
     return `M${pts.map((p) => p.join(",")).join("L")}Z`;
   };
 

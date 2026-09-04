@@ -39,7 +39,7 @@ export function AtlasMode({ meta, atlas, geo, state, update }: { meta: Meta; atl
       <aside className="side" aria-live="polite">
         {!sel || !selMeta ? (
           <>
-            <h2>Where forecasts bust, {meta.years.atlas?.[0]}–{meta.years.atlas?.at(-1)}</h2>
+            <h2>Where forecasts bust, {meta.years.atlas?.[0]} to {meta.years.atlas?.at(-1)}</h2>
             <p className="muted" style={{ marginTop: 8 }}>
               Historical bust rate of the Day {state.lead} Z500 forecast in {meta.seasons.find((s) => s.id === state.season)?.label.toLowerCase()}, from {meta.source_label}. Hover a region for its numbers; click to open its record.
             </p>

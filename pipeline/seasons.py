@@ -8,10 +8,10 @@ import pandas as pd
 SEASONS: list[str] = ["DJF", "MAM", "JJAS", "ON"]
 SEASON_CODES: dict[str, int] = {s: i for i, s in enumerate(SEASONS)}
 SEASON_LABELS: dict[str, str] = {
-    "DJF": "Winter (Dec–Feb)",
-    "MAM": "Pre-monsoon (Mar–May)",
-    "JJAS": "Monsoon (Jun–Sep)",
-    "ON": "Post-monsoon (Oct–Nov)",
+    "DJF": "Winter (Dec-Feb)",
+    "MAM": "Pre-monsoon (Mar-May)",
+    "JJAS": "Monsoon (Jun-Sep)",
+    "ON": "Post-monsoon (Oct-Nov)",
 }
 
 _MONTH_TO_SEASON = {

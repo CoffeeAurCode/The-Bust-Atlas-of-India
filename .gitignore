@@ -37,3 +37,5 @@ gcs-credentials*.json
 Thumbs.db
 .vscode/
 .idea/
+
+# frontend/public/data/*.json IS committed: it is the Vercel deployment's data source (cap 8 MB, enforced by tests)

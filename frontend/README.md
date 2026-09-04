@@ -8,4 +8,4 @@ Honesty rule: the model runs on 10 homogeneous regions; subdivision polygons are
 
 Before writing code: load the `design-taste-frontend` skill. Bar: an instrument, not a dashboard.
 
-`public/data/` is committed: it is what Vercel serves. Keep it under 8 MB (enforced by `pipeline/tests/test_export.py`). Vercel project root is this folder.
+`public/data/` is committed: it is what Vercel serves. Keep it under 16 MB (enforced by `pipeline/tests/test_export.py`). Vercel project root is this folder.

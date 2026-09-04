@@ -1,0 +1,836 @@
+{
+ "meta.json": {
+  "$defs": {
+   "RegionMeta": {
+    "properties": {
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "label": {
+      "title": "Label",
+      "type": "string"
+     },
+     "box": {
+      "description": "[lat0, lat1, lon0, lon1]",
+      "items": {
+       "type": "number"
+      },
+      "title": "Box",
+      "type": "array"
+     },
+     "centroid": {
+      "description": "[lat, lon]",
+      "items": {
+       "type": "number"
+      },
+      "title": "Centroid",
+      "type": "array"
+     }
+    },
+    "required": [
+     "id",
+     "label",
+     "box",
+     "centroid"
+    ],
+    "title": "RegionMeta",
+    "type": "object"
+   },
+   "SeasonMeta": {
+    "properties": {
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "label": {
+      "title": "Label",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "label"
+    ],
+    "title": "SeasonMeta",
+    "type": "object"
+   }
+  },
+  "properties": {
+   "product": {
+    "title": "Product",
+    "type": "string"
+   },
+   "source": {
+    "title": "Source",
+    "type": "string"
+   },
+   "source_label": {
+    "title": "Source Label",
+    "type": "string"
+   },
+   "members": {
+    "title": "Members",
+    "type": "integer"
+   },
+   "grid": {
+    "title": "Grid",
+    "type": "string"
+   },
+   "variable": {
+    "title": "Variable",
+    "type": "string"
+   },
+   "leads": {
+    "items": {
+     "type": "integer"
+    },
+    "title": "Leads",
+    "type": "array"
+   },
+   "years": {
+    "additionalProperties": {
+     "items": {
+      "type": "integer"
+     },
+     "type": "array"
+    },
+    "title": "Years",
+    "type": "object"
+   },
+   "regions": {
+    "items": {
+     "$ref": "#/$defs/RegionMeta"
+    },
+    "title": "Regions",
+    "type": "array"
+   },
+   "seasons": {
+    "items": {
+     "$ref": "#/$defs/SeasonMeta"
+    },
+    "title": "Seasons",
+    "type": "array"
+   },
+   "bust_definition": {
+    "title": "Bust Definition",
+    "type": "string"
+   },
+   "bands": {
+    "additionalProperties": {
+     "type": "number"
+    },
+    "description": "lower prob bound per band",
+    "title": "Bands",
+    "type": "object"
+   },
+   "flag_threshold": {
+    "title": "Flag Threshold",
+    "type": "number"
+   },
+   "generated_at": {
+    "title": "Generated At",
+    "type": "string"
+   },
+   "git_sha": {
+    "title": "Git Sha",
+    "type": "string"
+   },
+   "model": {
+    "additionalProperties": true,
+    "title": "Model",
+    "type": "object"
+   },
+   "rules": {
+    "additionalProperties": {
+     "items": {
+      "type": "string"
+     },
+     "type": "array"
+    },
+    "description": "feature -> [sentence if raises risk, sentence if lowers]",
+    "title": "Rules",
+    "type": "object"
+   },
+   "season_words": {
+    "additionalProperties": {
+     "type": "string"
+    },
+    "title": "Season Words",
+    "type": "object"
+   },
+   "synthetic": {
+    "default": false,
+    "title": "Synthetic",
+    "type": "boolean"
+   }
+  },
+  "required": [
+   "product",
+   "source",
+   "source_label",
+   "members",
+   "grid",
+   "variable",
+   "leads",
+   "years",
+   "regions",
+   "seasons",
+   "bust_definition",
+   "bands",
+   "flag_threshold",
+   "generated_at",
+   "git_sha",
+   "model",
+   "rules",
+   "season_words"
+  ],
+  "title": "Meta",
+  "type": "object"
+ },
+ "atlas.json": {
+  "$defs": {
+   "AtlasCell": {
+    "properties": {
+     "region": {
+      "title": "Region",
+      "type": "string"
+     },
+     "lead": {
+      "title": "Lead",
+      "type": "integer"
+     },
+     "season": {
+      "title": "Season",
+      "type": "string"
+     },
+     "n": {
+      "title": "N",
+      "type": "integer"
+     },
+     "bust_rate": {
+      "title": "Bust Rate",
+      "type": "number"
+     },
+     "err_p50": {
+      "title": "Err P50",
+      "type": "number"
+     },
+     "err_p90": {
+      "title": "Err P90",
+      "type": "number"
+     },
+     "err_p95": {
+      "title": "Err P95",
+      "type": "number"
+     },
+     "err_max": {
+      "title": "Err Max",
+      "type": "number"
+     },
+     "spread_p50": {
+      "title": "Spread P50",
+      "type": "number"
+     },
+     "spread_p95": {
+      "title": "Spread P95",
+      "type": "number"
+     },
+     "spread_skill": {
+      "title": "Spread Skill",
+      "type": "number"
+     },
+     "worst_events": {
+      "items": {
+       "$ref": "#/$defs/WorstEvent"
+      },
+      "title": "Worst Events",
+      "type": "array"
+     }
+    },
+    "required": [
+     "region",
+     "lead",
+     "season",
+     "n",
+     "bust_rate",
+     "err_p50",
+     "err_p90",
+     "err_p95",
+     "err_max",
+     "spread_p50",
+     "spread_p95",
+     "spread_skill",
+     "worst_events"
+    ],
+    "title": "AtlasCell",
+    "type": "object"
+   },
+   "NationalCell": {
+    "properties": {
+     "lead": {
+      "title": "Lead",
+      "type": "integer"
+     },
+     "season": {
+      "title": "Season",
+      "type": "string"
+     },
+     "n": {
+      "title": "N",
+      "type": "integer"
+     },
+     "bust_rate": {
+      "title": "Bust Rate",
+      "type": "number"
+     },
+     "err_p50": {
+      "title": "Err P50",
+      "type": "number"
+     },
+     "err_p95": {
+      "title": "Err P95",
+      "type": "number"
+     }
+    },
+    "required": [
+     "lead",
+     "season",
+     "n",
+     "bust_rate",
+     "err_p50",
+     "err_p95"
+    ],
+    "title": "NationalCell",
+    "type": "object"
+   },
+   "WorstEvent": {
+    "properties": {
+     "init": {
+      "title": "Init",
+      "type": "string"
+     },
+     "error": {
+      "title": "Error",
+      "type": "number"
+     }
+    },
+    "required": [
+     "init",
+     "error"
+    ],
+    "title": "WorstEvent",
+    "type": "object"
+   }
+  },
+  "properties": {
+   "cells": {
+    "items": {
+     "$ref": "#/$defs/AtlasCell"
+    },
+    "title": "Cells",
+    "type": "array"
+   },
+   "national": {
+    "items": {
+     "$ref": "#/$defs/NationalCell"
+    },
+    "title": "National",
+    "type": "array"
+   }
+  },
+  "required": [
+   "cells",
+   "national"
+  ],
+  "title": "Atlas",
+  "type": "object"
+ },
+ "inits.json": {
+  "properties": {
+   "inits": {
+    "items": {
+     "type": "string"
+    },
+    "title": "Inits",
+    "type": "array"
+   }
+  },
+  "required": [
+   "inits"
+  ],
+  "title": "Inits",
+  "type": "object"
+ },
+ "eval.json": {
+  "$defs": {
+   "PRPoint": {
+    "properties": {
+     "threshold": {
+      "title": "Threshold",
+      "type": "number"
+     },
+     "precision": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Precision"
+     },
+     "recall": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Recall"
+     }
+    },
+    "required": [
+     "threshold",
+     "precision",
+     "recall"
+    ],
+    "title": "PRPoint",
+    "type": "object"
+   },
+   "ReliabilityBin": {
+    "properties": {
+     "bin": {
+      "title": "Bin",
+      "type": "integer"
+     },
+     "lo": {
+      "title": "Lo",
+      "type": "number"
+     },
+     "hi": {
+      "title": "Hi",
+      "type": "number"
+     },
+     "n": {
+      "title": "N",
+      "type": "integer"
+     },
+     "mean_forecast": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Mean Forecast"
+     },
+     "observed_freq": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Observed Freq"
+     }
+    },
+    "required": [
+     "bin",
+     "lo",
+     "hi",
+     "n",
+     "mean_forecast",
+     "observed_freq"
+    ],
+    "title": "ReliabilityBin",
+    "type": "object"
+   },
+   "Scores": {
+    "properties": {
+     "brier": {
+      "title": "Brier",
+      "type": "number"
+     },
+     "bss_vs_climatology": {
+      "title": "Bss Vs Climatology",
+      "type": "number"
+     },
+     "bss_vs_spread": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Bss Vs Spread"
+     },
+     "pr_auc": {
+      "title": "Pr Auc",
+      "type": "number"
+     },
+     "roc_auc": {
+      "title": "Roc Auc",
+      "type": "number"
+     },
+     "reliability": {
+      "items": {
+       "$ref": "#/$defs/ReliabilityBin"
+      },
+      "title": "Reliability",
+      "type": "array"
+     },
+     "pr_curve": {
+      "items": {
+       "$ref": "#/$defs/PRPoint"
+      },
+      "title": "Pr Curve",
+      "type": "array"
+     }
+    },
+    "required": [
+     "brier",
+     "bss_vs_climatology",
+     "pr_auc",
+     "roc_auc",
+     "reliability",
+     "pr_curve"
+    ],
+    "title": "Scores",
+    "type": "object"
+   }
+  },
+  "properties": {
+   "n": {
+    "title": "N",
+    "type": "integer"
+   },
+   "positives": {
+    "title": "Positives",
+    "type": "integer"
+   },
+   "base_rate": {
+    "title": "Base Rate",
+    "type": "number"
+   },
+   "model": {
+    "$ref": "#/$defs/Scores"
+   },
+   "baseline": {
+    "$ref": "#/$defs/Scores"
+   },
+   "by_lead": {
+    "items": {
+     "additionalProperties": true,
+     "type": "object"
+    },
+    "title": "By Lead",
+    "type": "array"
+   },
+   "by_region": {
+    "items": {
+     "additionalProperties": true,
+     "type": "object"
+    },
+    "title": "By Region",
+    "type": "array"
+   },
+   "test_years": {
+    "items": {
+     "type": "integer"
+    },
+    "title": "Test Years",
+    "type": "array"
+   }
+  },
+  "required": [
+   "n",
+   "positives",
+   "base_rate",
+   "model",
+   "baseline",
+   "by_lead",
+   "by_region",
+   "test_years"
+  ],
+  "title": "Eval",
+  "type": "object"
+ },
+ "case_studies.json": {
+  "$defs": {
+   "CaseStudy": {
+    "properties": {
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "bust",
+       "verified"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "init": {
+      "title": "Init",
+      "type": "string"
+     },
+     "region": {
+      "title": "Region",
+      "type": "string"
+     },
+     "lead": {
+      "title": "Lead",
+      "type": "integer"
+     },
+     "prob": {
+      "title": "Prob",
+      "type": "number"
+     },
+     "narrative": {
+      "$ref": "#/$defs/Narrative"
+     }
+    },
+    "required": [
+     "id",
+     "title",
+     "kind",
+     "init",
+     "region",
+     "lead",
+     "prob",
+     "narrative"
+    ],
+    "title": "CaseStudy",
+    "type": "object"
+   },
+   "Narrative": {
+    "properties": {
+     "setup": {
+      "title": "Setup",
+      "type": "string"
+     },
+     "flag": {
+      "title": "Flag",
+      "type": "string"
+     },
+     "why": {
+      "title": "Why",
+      "type": "string"
+     },
+     "outcome": {
+      "title": "Outcome",
+      "type": "string"
+     }
+    },
+    "required": [
+     "setup",
+     "flag",
+     "why",
+     "outcome"
+    ],
+    "title": "Narrative",
+    "type": "object"
+   }
+  },
+  "properties": {
+   "cases": {
+    "items": {
+     "$ref": "#/$defs/CaseStudy"
+    },
+    "title": "Cases",
+    "type": "array"
+   }
+  },
+  "required": [
+   "cases"
+  ],
+  "title": "CaseStudies",
+  "type": "object"
+ },
+ "prediction": {
+  "$defs": {
+   "Driver": {
+    "properties": {
+     "feature": {
+      "title": "Feature",
+      "type": "string"
+     },
+     "contribution": {
+      "title": "Contribution",
+      "type": "number"
+     }
+    },
+    "required": [
+     "feature",
+     "contribution"
+    ],
+    "title": "Driver",
+    "type": "object"
+   },
+   "LeadPrediction": {
+    "properties": {
+     "lead": {
+      "title": "Lead",
+      "type": "integer"
+     },
+     "prob": {
+      "title": "Prob",
+      "type": "number"
+     },
+     "baseline_prob": {
+      "title": "Baseline Prob",
+      "type": "number"
+     },
+     "band": {
+      "enum": [
+       "low",
+       "moderate",
+       "high",
+       "severe"
+      ],
+      "title": "Band",
+      "type": "string"
+     },
+     "flag": {
+      "title": "Flag",
+      "type": "boolean"
+     },
+     "std": {
+      "title": "Std",
+      "type": "number"
+     },
+     "std_pct_climo": {
+      "title": "Std Pct Climo",
+      "type": "number"
+     },
+     "cluster_gap": {
+      "title": "Cluster Gap",
+      "type": "number"
+     },
+     "jumpiness": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Jumpiness"
+     },
+     "drivers": {
+      "items": {
+       "$ref": "#/$defs/Driver"
+      },
+      "title": "Drivers",
+      "type": "array"
+     },
+     "outcome": {
+      "anyOf": [
+       {
+        "$ref": "#/$defs/Outcome"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     }
+    },
+    "required": [
+     "lead",
+     "prob",
+     "baseline_prob",
+     "band",
+     "flag",
+     "std",
+     "std_pct_climo",
+     "cluster_gap",
+     "jumpiness",
+     "drivers",
+     "outcome"
+    ],
+    "title": "LeadPrediction",
+    "type": "object"
+   },
+   "Outcome": {
+    "properties": {
+     "error": {
+      "title": "Error",
+      "type": "number"
+     },
+     "threshold": {
+      "title": "Threshold",
+      "type": "number"
+     },
+     "busted": {
+      "title": "Busted",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "error",
+     "threshold",
+     "busted"
+    ],
+    "title": "Outcome",
+    "type": "object"
+   },
+   "RegionPrediction": {
+    "properties": {
+     "leads": {
+      "items": {
+       "$ref": "#/$defs/LeadPrediction"
+      },
+      "title": "Leads",
+      "type": "array"
+     }
+    },
+    "required": [
+     "leads"
+    ],
+    "title": "RegionPrediction",
+    "type": "object"
+   }
+  },
+  "properties": {
+   "init": {
+    "title": "Init",
+    "type": "string"
+   },
+   "source": {
+    "title": "Source",
+    "type": "string"
+   },
+   "regions": {
+    "additionalProperties": {
+     "$ref": "#/$defs/RegionPrediction"
+    },
+    "title": "Regions",
+    "type": "object"
+   }
+  },
+  "required": [
+   "init",
+   "source",
+   "regions"
+  ],
+  "title": "Prediction",
+  "type": "object"
+ }
+}

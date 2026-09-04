@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Atlas, CaseStudies, Eval, Inits, Meta, Prediction, type GeoCollection } from "./schema";
+import { Atlas, CaseStudies, Eval, Inits, Live, Meta, Prediction, type GeoCollection } from "./schema";
 
 const cache = new Map<string, Promise<unknown>>();
 
@@ -23,6 +23,7 @@ export const api = {
   inits: () => load("/data/inits.json", Inits),
   eval: () => load("/data/eval.json", Eval),
   cases: () => load("/data/case_studies.json", CaseStudies),
+  live: () => load("/data/live.json", Live),
   prediction: (init: string) => load(`/data/predictions/${init}.json`, Prediction),
   geo: () => load("/data/india.geojson", z.custom<GeoCollection>((v) => typeof v === "object" && v !== null && (v as GeoCollection).type === "FeatureCollection")),
 };

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import pickle
 import shutil
 import subprocess
 import sys
@@ -119,6 +120,12 @@ def main() -> None:
     base = SpreadBaseline().fit(ca)
     model = BustModel().fit(tr, ca, num_rounds=args.rounds)
     model.save(art / "model.pkl")
+    # persisted so scripts/cross_model.py can score another ensemble with the SAME
+    # Tier-0 training statistics and the SAME calibrated spread baseline (no refitting).
+    with open(art / "feature_stats.pkl", "wb") as f:
+        pickle.dump(stats, f)
+    with open(art / "baseline.pkl", "wb") as f:
+        pickle.dump(base, f)
     te["p_base"] = base.predict_proba(te)
     te["p_model"] = model.predict_proba(te)
 

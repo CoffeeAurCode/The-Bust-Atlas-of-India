@@ -372,6 +372,69 @@
  },
  "eval.json": {
   "$defs": {
+   "CrossModel": {
+    "description": "Scores of the SAME trained model on box-stats from a different ensemble.",
+    "properties": {
+     "source": {
+      "title": "Source",
+      "type": "string"
+     },
+     "source_label": {
+      "title": "Source Label",
+      "type": "string"
+     },
+     "members": {
+      "title": "Members",
+      "type": "integer"
+     },
+     "n": {
+      "title": "N",
+      "type": "integer"
+     },
+     "positives": {
+      "title": "Positives",
+      "type": "integer"
+     },
+     "base_rate": {
+      "title": "Base Rate",
+      "type": "number"
+     },
+     "model": {
+      "$ref": "#/$defs/Scores"
+     },
+     "baseline": {
+      "$ref": "#/$defs/Scores"
+     },
+     "by_lead": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "By Lead",
+      "type": "array"
+     },
+     "test_years": {
+      "items": {
+       "type": "integer"
+      },
+      "title": "Test Years",
+      "type": "array"
+     }
+    },
+    "required": [
+     "source",
+     "source_label",
+     "members",
+     "n",
+     "positives",
+     "base_rate",
+     "model",
+     "baseline",
+     "by_lead"
+    ],
+    "title": "CrossModel",
+    "type": "object"
+   },
    "PRPoint": {
     "properties": {
      "threshold": {
@@ -559,6 +622,17 @@
     },
     "title": "Test Years",
     "type": "array"
+   },
+   "cross_model": {
+    "anyOf": [
+     {
+      "$ref": "#/$defs/CrossModel"
+     },
+     {
+      "type": "null"
+     }
+    ],
+    "default": null
    }
   },
   "required": [

@@ -10,6 +10,13 @@ export function EvidenceMode({ meta, ev }: { meta: Meta; ev: Eval }) {
     ["PR-AUC", ev.baseline.pr_auc, ev.model.pr_auc, false],
     ["ROC-AUC", ev.baseline.roc_auc, ev.model.roc_auc, false],
   ] as const;
+  const cm = ev.cross_model;
+  const crossRows: [string, number, number][] = cm ? [
+    ["Brier score (lower is better)", ev.model.brier, cm.model.brier],
+    ["Brier skill vs climatology", ev.model.bss_vs_climatology, cm.model.bss_vs_climatology],
+    ["PR-AUC", ev.model.pr_auc, cm.model.pr_auc],
+    ["ROC-AUC", ev.model.roc_auc, cm.model.roc_auc],
+  ] : [];
   const byRegion = ev.by_region.map((r) => ({ ...r, label: meta.regions.find((m) => m.id === r.region)?.label ?? String(r.region) }));
   return (
     <div className="page">
@@ -51,11 +58,33 @@ export function EvidenceMode({ meta, ev }: { meta: Meta; ev: Eval }) {
           <p className="cap">PR-AUC per lead day.</p>
           <Bars rows={ev.by_lead.map((r) => ({ ...r, label: `Day ${r.lead}` }))} a="model_pr_auc" b="baseline_pr_auc" labelKey="label" aLabel="this system" bLabel="spread" />
         </div>
+        {ev.cross_model && (
+          <div className="figure">
+            <h4>Same model, different ensemble</h4>
+            <p className="cap">
+              The confidence layer was trained on {meta.source_label} and then scored, unchanged, on {ev.cross_model.source_label} with {ev.cross_model.members} members, over the same test year: {ev.cross_model.n.toLocaleString()} region-lead forecasts, {ev.cross_model.positives.toLocaleString()} busts ({(ev.cross_model.base_rate * 100).toFixed(1)}%). Nothing was refitted, not the thresholds, not the model, not the calibration. Some drop is expected when the ensemble changes, and it is reported here rather than hidden.
+            </p>
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>{meta.source_label} (trained on)</th>
+                  <th>{ev.cross_model.source_label} (never seen)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {crossRows.map(([k, a, b]) => (
+                  <tr key={k}><td>{k}</td><td>{f3(a)}</td><td>{f3(b)}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
       <div className="method">
         <h4 style={{ fontSize: 15, marginBottom: 8 }}>Method</h4>
         <blockquote>{meta.bust_definition}</blockquote>
-        <p>Training ensemble: {meta.source_label}, {meta.members} members, {meta.grid}. Truth: ERA5 reanalysis with a 1990–2019 climatology. Variable: {meta.variable}.</p>
+        <p>Training ensemble: {meta.source_label}, {meta.members} members, {meta.grid}. Truth: ERA5 reanalysis with a 1990 to 2019 climatology. Variable: {meta.variable}.</p>
         <p>Split: trained on {meta.years.train?.join(", ")}, calibrated on {meta.years.cal?.join(", ")}, tested on {meta.years.test?.join(", ")}. Strictly temporal; no random shuffling.</p>
         <p>Every feature is computed from information available when the forecast is issued: ensemble spread and its growth across lead days, the shape of the member distribution, whether the members have split into camps, how much the run changed from the previous day's run for the same valid time, and the historical bust rate of that region, lead and season. A test in the repository recomputes all features on a truncated archive and asserts they are identical.</p>
         <p>Model: gradient-boosted trees with class weighting, then isotonic calibration on the held-out year. Explanations come from the per-feature contribution of each prediction, rendered through a fixed table of sentences.</p>

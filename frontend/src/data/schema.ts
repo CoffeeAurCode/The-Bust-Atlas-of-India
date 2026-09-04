@@ -91,12 +91,23 @@ const Scores = z.object({
   brier: z.number(), bss_vs_climatology: z.number(), bss_vs_spread: z.number().nullable().optional(),
   pr_auc: z.number(), roc_auc: z.number(), reliability: z.array(Bin), pr_curve: z.array(PRPoint),
 });
+// Part 11: the same trained model scored, unchanged, on a different ensemble.
+export const CrossModel = z.object({
+  source: z.string(), source_label: z.string(), members: z.number().int(),
+  n: z.number().int(), positives: z.number().int(), base_rate: z.number(),
+  model: Scores, baseline: Scores,
+  by_lead: z.array(z.record(z.string(), z.unknown())),
+  test_years: z.array(z.number().int()).default([]),
+});
+export type CrossModel = z.infer<typeof CrossModel>;
+
 export const Eval = z.object({
   n: z.number().int(), positives: z.number().int(), base_rate: z.number(),
   model: Scores, baseline: Scores,
   by_lead: z.array(z.record(z.string(), z.unknown())),
   by_region: z.array(z.record(z.string(), z.unknown())),
   test_years: z.array(z.number().int()),
+  cross_model: CrossModel.nullable().optional(),
 });
 export type Eval = z.infer<typeof Eval>;
 
@@ -109,6 +120,19 @@ export const CaseStudies = z.object({
 });
 export type CaseStudies = z.infer<typeof CaseStudies>;
 export type CaseStudy = CaseStudies["cases"][number];
+
+/** live.json: today's Open-Meteo WeatherNext 2 run. Mirrors pipeline/schemas.py::Live.
+ *  Optional file: it needs the network to produce, so the app must work without it. */
+export const Live = z.object({
+  fetched_at: z.string(),
+  init: z.string(),
+  source: z.string(),
+  source_label: z.string(),
+  members: z.number().int(),
+  stale_after_hours: z.number().int().default(36),
+  regions: z.record(z.string(), z.object({ leads: z.array(LeadPrediction) })),
+});
+export type Live = z.infer<typeof Live>;
 
 export type GeoFeature = {
   type: "Feature";

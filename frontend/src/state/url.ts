@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 export type Mode = "atlas" | "today" | "evidence" | "cases";
 export type AtlasMetric = "bust_rate" | "err_p95";
+export type Source = "archive" | "live";
 
 export type UrlState = {
   mode: Mode;
@@ -11,9 +12,10 @@ export type UrlState = {
   init: string | null;
   metric: AtlasMetric;
   case: string | null;
+  source: Source;
 };
 
-const DEFAULTS: UrlState = { mode: "atlas", season: "JJAS", lead: 5, region: null, init: null, metric: "bust_rate", case: null };
+const DEFAULTS: UrlState = { mode: "atlas", season: "JJAS", lead: 5, region: null, init: null, metric: "bust_rate", case: null, source: "archive" };
 
 export function parse(search: string): UrlState {
   const p = new URLSearchParams(search);
@@ -27,6 +29,7 @@ export function parse(search: string): UrlState {
     init: p.get("init"),
     metric: (p.get("metric") as AtlasMetric) === "err_p95" ? "err_p95" : "bust_rate",
     case: p.get("case"),
+    source: p.get("source") === "live" ? "live" : DEFAULTS.source,
   };
 }
 
@@ -39,6 +42,7 @@ export function serialise(s: UrlState): string {
   if (s.init) p.set("init", s.init);
   if (s.metric !== DEFAULTS.metric) p.set("metric", s.metric);
   if (s.case) p.set("case", s.case);
+  if (s.source !== DEFAULTS.source) p.set("source", s.source);
   const q = p.toString();
   return q ? `?${q}` : "";
 }

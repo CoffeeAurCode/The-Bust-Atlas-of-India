@@ -145,6 +145,21 @@ class Scores(BaseModel):
     pr_curve: list[PRPoint]
 
 
+class CrossModel(BaseModel):
+    """Scores of the SAME trained model on box-stats from a different ensemble."""
+
+    source: str
+    source_label: str
+    members: int
+    n: int
+    positives: int
+    base_rate: float
+    model: Scores
+    baseline: Scores
+    by_lead: list[dict]
+    test_years: list[int] = Field(default_factory=list)
+
+
 class Eval(BaseModel):
     n: int
     positives: int
@@ -154,6 +169,7 @@ class Eval(BaseModel):
     by_lead: list[dict]
     by_region: list[dict]
     test_years: list[int]
+    cross_model: CrossModel | None = None
 
 
 class Narrative(BaseModel):
@@ -176,6 +192,23 @@ class CaseStudy(BaseModel):
 
 class CaseStudies(BaseModel):
     cases: list[CaseStudy]
+
+
+class Live(BaseModel):
+    """Today's live run: same shape as Prediction, plus provenance and a staleness budget.
+
+    Not in ALL: live.json is optional (it needs the network) and the export test must
+    keep passing without it. `outcome` is always None (nothing has verified yet) and
+    `jumpiness` is None (Open-Meteo serves no previous run for pressure levels).
+    """
+
+    fetched_at: str
+    init: str
+    source: str
+    source_label: str
+    members: int
+    stale_after_hours: int = 36
+    regions: dict[str, RegionPrediction]
 
 
 ALL = {

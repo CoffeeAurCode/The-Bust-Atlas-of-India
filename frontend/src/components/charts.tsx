@@ -3,6 +3,19 @@ import { line as d3line } from "d3-shape";
 import { format } from "d3-format";
 
 const f2 = format(".2f");
+
+/** Smallest round number at or above v, so an axis fitted to the data still has readable
+ *  ticks. Steps at 1, 2 and 5 times a power of ten, the usual axis progression. */
+function niceCeil(v: number): number {
+  if (!(v > 0)) return 1;
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  return (([1, 2, 5, 10].find((s) => v <= s * p + 1e-12) ?? 10) * p);
+}
+
+/** Five evenly spaced ticks from 0 to lim inclusive. */
+function ticks(lim: number): number[] {
+  return [0, 0.25, 0.5, 0.75, 1].map((t) => Number((t * lim).toFixed(6)));
+}
 const f0 = format(".0f");
 
 export function LeadCurve({ points, baseline, lead, onLead, flagAt }: {
@@ -67,25 +80,32 @@ export function Distribution({ p50, p90, p95, max, value, unit }: { p50: number;
 
 export function Reliability({ bins, baseline }: { bins: { mean_forecast: number | null; observed_freq: number | null; n: number }[]; baseline?: { mean_forecast: number | null; observed_freq: number | null; n: number }[] }) {
   const W = 360, H = 300, m = { l: 40, r: 10, t: 10, b: 34 };
-  const x = scaleLinear().domain([0, 1]).range([m.l, W - m.r]);
-  const y = scaleLinear().domain([0, 1]).range([H - m.b, m.t]);
   const pts = (b: typeof bins) => b.filter((d) => d.mean_forecast != null && d.observed_freq != null && d.n > 20) as { mean_forecast: number; observed_freq: number; n: number }[];
+  // Busts are rare and the system is honest about it, so no bin ever reaches a high
+  // probability: on a fixed 0 to 1 square every point piles into the bottom-left corner
+  // and the diagram says nothing. Fit the axes to the range actually used instead, and
+  // keep them square so distance from the diagonal still reads as miscalibration.
+  const lim = niceCeil(Math.max(0.1, ...pts(bins).flatMap((d) => [d.mean_forecast, d.observed_freq]),
+                       ...pts(baseline ?? []).flatMap((d) => [d.mean_forecast, d.observed_freq])));
+  const x = scaleLinear().domain([0, lim]).range([m.l, W - m.r]);
+  const y = scaleLinear().domain([0, lim]).range([H - m.b, m.t]);
   const ln = d3line<{ mean_forecast: number; observed_freq: number }>().x((d) => x(d.mean_forecast)).y((d) => y(d.observed_freq));
   const maxN = Math.max(...bins.map((b) => b.n));
   return (
     <svg className="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Reliability diagram">
-      {[0, 0.25, 0.5, 0.75, 1].map((v) => (
+      {ticks(lim).map((v) => (
         <g key={v}>
           <line className="grid" x1={m.l} x2={W - m.r} y1={y(v)} y2={y(v)} />
           <text x={m.l - 6} y={y(v) + 3} textAnchor="end">{f2(v)}</text>
           <text x={x(v)} y={H - m.b + 14} textAnchor="middle">{f2(v)}</text>
         </g>
       ))}
-      <line className="ref" x1={x(0)} y1={y(0)} x2={x(1)} y2={y(1)} />
-      {bins.map((b, i) => (
-        <rect key={i} className="strip" x={x(i / bins.length) + 1} width={(x(1) - x(0)) / bins.length - 2}
+      <line className="ref" x1={x(0)} y1={y(0)} x2={x(lim)} y2={y(lim)} />
+      {bins.map((b, i) => (i / bins.length >= lim ? null : (
+        <rect key={i} className="strip" x={x(i / bins.length) + 1}
+              width={Math.max(x(Math.min((i + 1) / bins.length, lim)) - x(i / bins.length) - 2, 1)}
               y={y(0) - 22 * (b.n / maxN)} height={22 * (b.n / maxN)} />
-      ))}
+      )))}
       {baseline && <path className="line line--base" d={ln(pts(baseline)) ?? ""} />}
       <path className="line" d={ln(pts(bins)) ?? ""} />
       {pts(bins).map((d, i) => <circle key={i} className="dot" cx={x(d.mean_forecast)} cy={y(d.observed_freq)} r={3} />)}
@@ -97,18 +117,24 @@ export function Reliability({ bins, baseline }: { bins: { mean_forecast: number 
 
 export function PRCurve({ model, baseline, baseRate }: { model: { precision: number | null; recall: number | null }[]; baseline: { precision: number | null; recall: number | null }[]; baseRate: number }) {
   const W = 360, H = 300, m = { l: 40, r: 10, t: 10, b: 34 };
-  const x = scaleLinear().domain([0, 1]).range([m.l, W - m.r]);
-  const y = scaleLinear().domain([0, 1]).range([H - m.b, m.t]);
   const clean = (c: typeof model) => c.filter((d) => d.precision != null && d.recall != null).sort((a, b) => (b.recall! - a.recall!)) as { precision: number; recall: number }[];
+  // Precision on a rare event never approaches 1, so the curve would sit flat along the
+  // bottom of a full square. Recall genuinely spans 0 to 1 and keeps its own axis.
+  const pmax = niceCeil(Math.max(0.1, baseRate * 1.5, ...clean(model).map((d) => d.precision),
+                                 ...clean(baseline).map((d) => d.precision)));
+  const x = scaleLinear().domain([0, 1]).range([m.l, W - m.r]);
+  const y = scaleLinear().domain([0, pmax]).range([H - m.b, m.t]);
   const ln = d3line<{ precision: number; recall: number }>().x((d) => x(d.recall)).y((d) => y(d.precision));
   return (
     <svg className="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Precision-recall curve">
+      {ticks(pmax).map((v) => (
+        <line key={`h${v}`} className="grid" x1={m.l} x2={W - m.r} y1={y(v)} y2={y(v)} />
+      ))}
+      {ticks(pmax).map((v) => (
+        <text key={`hl${v}`} x={m.l - 6} y={y(v) + 3} textAnchor="end">{f2(v)}</text>
+      ))}
       {[0, 0.25, 0.5, 0.75, 1].map((v) => (
-        <g key={v}>
-          <line className="grid" x1={m.l} x2={W - m.r} y1={y(v)} y2={y(v)} />
-          <text x={m.l - 6} y={y(v) + 3} textAnchor="end">{f2(v)}</text>
-          <text x={x(v)} y={H - m.b + 14} textAnchor="middle">{f2(v)}</text>
-        </g>
+        <text key={`v${v}`} x={x(v)} y={H - m.b + 14} textAnchor="middle">{f2(v)}</text>
       ))}
       <line className="ref" x1={x(0)} x2={x(1)} y1={y(baseRate)} y2={y(baseRate)} />
       <text x={x(1)} y={y(baseRate) - 4} textAnchor="end">no skill {f2(baseRate)}</text>

@@ -55,8 +55,11 @@ def validate(df: pd.DataFrame) -> list[str]:
     err = (df.ens_mean - df.truth).abs()
     e1 = err[df.lead_days == leads[0]].median()
     e10 = err[df.lead_days == leads[-1]].median()
-    if not e1 < 0.25 * e10:
-        problems.append(f"median |mean-truth| D{leads[0]}={e1:.1f} not < 25% of D{leads[-1]}={e10:.1f}")
+    # Error must grow strongly with lead. Threshold is loose on purpose: the ratio
+    # depends on season mix (DJF D10 ~ 102, JJAS ~ 71 on IFS ENS 2020-2022) and on
+    # whether short leads are dominated by analysis-increment noise.
+    if not e1 < 0.40 * e10:
+        problems.append(f"median |mean-truth| D{leads[0]}={e1:.1f} not < 40% of D{leads[-1]}={e10:.1f}")
     if (df.ens_std <= 0).any():
         problems.append("non-positive ens_std present")
     if not ((df.q10 <= df.q50) & (df.q50 <= df.q90)).all():

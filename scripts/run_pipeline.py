@@ -71,9 +71,11 @@ def git_sha() -> str:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True)
-    ap.add_argument("--train", nargs="+", type=int, default=[2020])
-    ap.add_argument("--cal", nargs="+", type=int, default=[2021])
+    ap.add_argument("--dev", nargs="+", type=int, default=[2020, 2021],
+                    help="development years: thresholds, Tier-0 stats, training and "
+                         "out-of-fold calibration all come from these. Never the test years.")
     ap.add_argument("--test", nargs="+", type=int, default=[2022])
+    ap.add_argument("--folds", type=int, default=5, help="contiguous CV folds within --dev")
     ap.add_argument("--pct", type=float, default=95.0)
     ap.add_argument("--out", default="frontend/public/data")
     ap.add_argument("--artifacts", default="data/artifacts")
@@ -92,14 +94,16 @@ def main() -> None:
     df = pd.read_parquet(args.input)
     source = str(df.source.iloc[0])
     source_label, members = SOURCE_LABELS.get(source, (source, 0))
-    train_years = args.train
-    fit_years = args.train + args.cal  # thresholds and Tier-0 stats may use train+cal (all pre-test)
+    fit_years = args.dev  # thresholds, Tier-0 stats, training, calibration: all pre-test
+    overlap = set(args.dev) & set(args.test)
+    if overlap:
+        raise SystemExit(f"--dev and --test overlap on {sorted(overlap)}; that is leakage")
 
     # 1. labels
     labelled, thresholds = label(df, train_years=fit_years, pct=args.pct)
     pos = labelled[labelled.year.isin(fit_years)].bust.sum()
     print(f"[labels] p{args.pct:.0f}: {pos} busts in {len(labelled[labelled.year.isin(fit_years)])} "
-          f"train+cal rows ({pos / len(labelled[labelled.year.isin(fit_years)]):.2%})")
+          f"development rows ({pos / len(labelled[labelled.year.isin(fit_years)]):.2%})")
     thresholds.to_parquet(art / "thresholds.parquet", index=False)
 
     # 2. atlas (pre-test years only: it is the "historical" benchmark)
@@ -112,13 +116,15 @@ def main() -> None:
     stats = fit_feature_stats(hist)
     feat = build_features(labelled, stats)
     warm = feat.init > feat.init.min() + pd.Timedelta(days=2)
-    tr = feat[warm & feat.year.isin(train_years)]
-    ca = feat[warm & feat.year.isin(args.cal)]
+    dev = feat[warm & feat.year.isin(fit_years)]
     te = feat[warm & feat.year.isin(args.test)].copy()
 
-    # 4. baseline + model
-    base = SpreadBaseline().fit(ca)
-    model = BustModel().fit(tr, ca, num_rounds=args.rounds)
+    # 4. baseline + model. Both are fitted on the whole development period and calibrated
+    # the same way, so the headline comparison is not an artefact of the calibrator.
+    base = SpreadBaseline().fit(dev)
+    model = BustModel().fit_cv(dev, n_folds=args.folds, num_rounds=args.rounds)
+    print(f"[model] {model.meta['n_seeds']} seeds, {args.folds} folds, "
+          f"{model.meta['best_iterations'][0]} rounds, n_dev={model.meta['n_train']}")
     model.save(art / "model.pkl")
     # persisted so scripts/cross_model.py can score another ensemble with the SAME
     # Tier-0 training statistics and the SAME calibrated spread baseline (no refitting).
@@ -206,7 +212,7 @@ def main() -> None:
         "source": source, "source_label": source_label, "members": members,
         "grid": "64x32 equiangular (~5.6°)", "variable": "Z500 (500 hPa geopotential, m² s⁻²)",
         "leads": sorted(int(x) for x in df.lead_days.unique()),
-        "years": {"train": train_years, "cal": args.cal, "test": args.test, "atlas": fit_years},
+        "years": {"train": args.dev, "cal": args.dev, "test": args.test, "atlas": fit_years},
         "regions": [{"id": k, "label": b.label, "box": [b.lat0, b.lat1, b.lon0, b.lon1],
                      "centroid": list(b.centroid)} for k, b in REGIONS.items()],
         "state_to_region": STATE_TO_REGION,

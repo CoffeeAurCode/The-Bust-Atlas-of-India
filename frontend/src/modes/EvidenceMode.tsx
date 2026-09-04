@@ -40,7 +40,7 @@ export function EvidenceMode({ meta, ev }: { meta: Meta; ev: Eval }) {
         </div>
         <div className="figure">
           <h4>Reliability</h4>
-          <p className="cap">When the system says 30%, does it bust 30% of the time? Points on the diagonal are honest probabilities. Bars show how many forecasts fall in each bin.</p>
+          <p className="cap">When the system says 15%, does it bust 15% of the time? Points on the diagonal are honest probabilities. Bars show how many forecasts fall in each bin.</p>
           <Reliability bins={ev.model.reliability} baseline={ev.baseline.reliability} />
         </div>
         <div className="figure">

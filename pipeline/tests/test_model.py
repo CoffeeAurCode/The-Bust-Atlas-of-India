@@ -68,3 +68,50 @@ def test_baseline_fits_and_predicts(synthetic_small):
     b = SpreadBaseline().fit(ca)
     p = b.predict_proba(te)
     assert p.shape == (len(te),) and p.min() >= 0 and p.max() <= 1
+
+
+def test_early_stopping_does_not_bail_immediately(synthetic):
+    """Regression: with scale_pos_weight applied to training but not to the validation
+    set, early stopping on binary_logloss fired at iteration 1 and the shipped model was
+    a single tree. Early stopping now scores AUC, so it must actually boost."""
+    f = _frame(synthetic)
+    m = BustModel().fit(f[f.year == 2020], f[f.year == 2021], num_rounds=200)
+    assert m.meta["params"]["metric"] == "auc"
+    assert max(m.meta["best_iterations"]) > 3, m.meta["best_iterations"]
+
+
+def test_calibration_preserves_ranking(synthetic):
+    """The calibrator is strictly increasing, so it must not change the ordering of
+    predictions. Plain isotonic flattened them onto a few dozen values and cost PR-AUC."""
+    f = _frame(synthetic)
+    te = f[f.year == 2022]
+    m = BustModel().fit(f[f.year == 2020], f[f.year == 2021], num_rounds=100)
+    raw, cal = m.predict_raw(te), m.predict_proba(te)
+    assert np.array_equal(np.argsort(raw, kind="stable"), np.argsort(cal, kind="stable"))
+    assert len(np.unique(cal)) == len(np.unique(raw))
+    assert (cal >= 0).all() and (cal <= 1).all()
+
+
+def test_fit_cv_scores_every_row_out_of_fold(synthetic):
+    """fit_cv must train on the whole development period and calibrate on scores from
+    boosters that never saw the row. Folds are contiguous in init date."""
+    f = _frame(synthetic)
+    dev = f[f.year.isin([2020, 2021])]
+    m = BustModel().fit_cv(dev, n_folds=3, num_rounds=60, n_seeds=2)
+    assert m.meta["cv_folds"] == 3
+    assert m.meta["n_train"] == len(dev)
+    # rounds are fixed up front, so every fold and the final fit use the same count and
+    # no block is surrendered to early stopping
+    assert len(set(m.meta["best_iterations"])) == 1
+    p = m.predict_proba(f[f.year == 2022])
+    assert np.isfinite(p).all() and (p >= 0).all() and (p <= 1).all()
+
+
+def test_baseline_and_model_share_a_calibrator(synthetic):
+    """The headline claim is model vs spread baseline, so a difference between them must
+    not be a difference of calibrator."""
+    f = _frame(synthetic)
+    dev = f[f.year.isin([2020, 2021])]
+    b = SpreadBaseline().fit(dev)
+    m = BustModel().fit_cv(dev, n_folds=3, num_rounds=60, n_seeds=2)
+    assert type(b.cal) is type(m.cal)

@@ -71,7 +71,7 @@ export default function App() {
         <CasesMode meta={data.meta} cases={data.cases} state={state} update={update} />
       ) : <div className="page"><h2>Case studies</h2><p className="empty">Not exported yet.</p></div>}
       <footer className="foot">
-        <span>Vishwas, SIH26079. Decision support for forecasters; not a replacement for IMD's official bulletin.</span>
+        <span>Vishwas by Team Gryffindor, SIH26079. Decision support for forecasters; not a replacement for IMD's official bulletin.</span>
         <span>{data ? `${data.meta.source_label} · ERA5 truth · WeatherBench 2 · build ${data.meta.git_sha}` : ""}</span>
       </footer>
     </div>

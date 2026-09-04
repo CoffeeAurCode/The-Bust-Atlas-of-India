@@ -1,4 +1,4 @@
-# Vishwas — forecast bust detection (SIH26079)
+# Vishwas — forecast bust detection (SIH26079, Team Gryffindor)
 
 A model-agnostic confidence layer for medium-range ensemble forecasts. Reads any ensemble at issue time and predicts, per Indian region and lead time (Day 1–10), the probability that the forecast will *bust*, with a plain-language meteorological explanation.
 

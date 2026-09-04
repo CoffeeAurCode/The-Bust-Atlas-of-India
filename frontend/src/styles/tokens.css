@@ -1,0 +1,93 @@
+/* The Bust Atlas of India: design tokens.
+   Palette: cool neutral paper + one accent (rust) for risk. Terracotta on slate.
+   Type: Newsreader for the masthead and titles (an atlas is a publication),
+   Geist for UI, Geist Mono for every number. */
+
+:root {
+  --bg: #f3f2ee;
+  --surface: #fbfbf9;
+  --surface-2: #ecebe6;
+  --ink: #1b1e22;
+  --ink-2: #3c4147;
+  --muted: #6c727b;
+  --hair: #d6d8d2;
+  --hair-2: #c2c5bd;
+  --accent: #b5452c;
+  --accent-ink: #8a2f1c;
+  --accent-soft: #f1d9d1;
+  --ok: #4c6b57;
+  --sea: #e7ebec;
+  --land: #e3e1da;
+
+  /* sequential risk ramp, low -> high */
+  --risk-0: #e9e7e0;
+  --risk-1: #ebc9b8;
+  --risk-2: #dc9a7b;
+  --risk-3: #c8674a;
+  --risk-4: #a23f28;
+  --risk-5: #5e1f12;
+
+  --font-display: "Newsreader Variable", Georgia, "Times New Roman", serif;
+  --font-ui: "Geist Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --radius: 4px;
+  --shadow: 0 1px 0 rgba(27, 30, 34, 0.04), 0 8px 24px -12px rgba(27, 30, 34, 0.18);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --nav-h: 64px;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #141618;
+  --surface: #1b1e21;
+  --surface-2: #22262a;
+  --ink: #ebeae4;
+  --ink-2: #c9cbc4;
+  --muted: #8f959c;
+  --hair: #2b3035;
+  --hair-2: #3a4046;
+  --accent: #d8735a;
+  --accent-ink: #e89a86;
+  --accent-soft: #3a241d;
+  --ok: #8fb59c;
+  --sea: #171a1d;
+  --land: #262a2e;
+
+  --risk-0: #2a2e32;
+  --risk-1: #4b3a33;
+  --risk-2: #7a4634;
+  --risk-3: #b05a3f;
+  --risk-4: #d8846a;
+  --risk-5: #f2b9a5;
+
+  --shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 12px 32px -14px rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141618;
+    --surface: #1b1e21;
+    --surface-2: #22262a;
+    --ink: #ebeae4;
+    --ink-2: #c9cbc4;
+    --muted: #8f959c;
+    --hair: #2b3035;
+    --hair-2: #3a4046;
+    --accent: #d8735a;
+    --accent-ink: #e89a86;
+    --accent-soft: #3a241d;
+    --ok: #8fb59c;
+    --sea: #171a1d;
+    --land: #262a2e;
+    --risk-0: #2a2e32;
+    --risk-1: #4b3a33;
+    --risk-2: #7a4634;
+    --risk-3: #b05a3f;
+    --risk-4: #d8846a;
+    --risk-5: #f2b9a5;
+    --shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 12px 32px -14px rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+}

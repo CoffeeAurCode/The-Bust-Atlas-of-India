@@ -33,6 +33,7 @@ class Meta(BaseModel):
     leads: list[int]
     years: dict[str, list[int]]
     regions: list[RegionMeta]
+    state_to_region: dict[str, str]
     seasons: list[SeasonMeta]
     bust_definition: str
     bands: dict[str, float] = Field(description="lower prob bound per band")

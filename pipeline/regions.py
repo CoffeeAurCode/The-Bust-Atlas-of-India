@@ -50,6 +50,7 @@ STATE_TO_REGION: dict[str, str] = {
     "ladakh": "western_himalaya",
     "himachal_pradesh": "western_himalaya",
     "uttarakhand": "western_himalaya",
+    "uttaranchal": "western_himalaya",
     "punjab": "north_west",
     "haryana": "north_west",
     "chandigarh": "north_west",

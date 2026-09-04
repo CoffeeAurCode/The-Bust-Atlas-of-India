@@ -31,7 +31,7 @@ from pipeline.explain import RULES, SEASON_WORDS, drivers  # noqa: E402
 from pipeline.features import build_features, fit_feature_stats  # noqa: E402
 from pipeline.labels import label  # noqa: E402
 from pipeline.model import BustModel  # noqa: E402
-from pipeline.regions import REGIONS  # noqa: E402
+from pipeline.regions import REGIONS, STATE_TO_REGION  # noqa: E402
 from pipeline.seasons import SEASON_LABELS, SEASONS  # noqa: E402
 
 BUST_DEFINITION = (
@@ -202,6 +202,7 @@ def main() -> None:
         "years": {"train": train_years, "cal": args.cal, "test": args.test, "atlas": fit_years},
         "regions": [{"id": k, "label": b.label, "box": [b.lat0, b.lat1, b.lon0, b.lon1],
                      "centroid": list(b.centroid)} for k, b in REGIONS.items()],
+        "state_to_region": STATE_TO_REGION,
         "seasons": [{"id": s, "label": SEASON_LABELS[s]} for s in SEASONS],
         "bust_definition": BUST_DEFINITION,
         "bands": BANDS, "flag_threshold": FLAG_THRESHOLD,

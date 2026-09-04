@@ -105,6 +105,13 @@
     "title": "Regions",
     "type": "array"
    },
+   "state_to_region": {
+    "additionalProperties": {
+     "type": "string"
+    },
+    "title": "State To Region",
+    "type": "object"
+   },
    "seasons": {
     "items": {
      "$ref": "#/$defs/SeasonMeta"
@@ -175,6 +182,7 @@
    "leads",
    "years",
    "regions",
+   "state_to_region",
    "seasons",
    "bust_definition",
    "bands",

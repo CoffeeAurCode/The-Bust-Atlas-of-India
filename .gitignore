@@ -39,3 +39,8 @@ Thumbs.db
 .idea/
 
 # frontend/public/data/*.json IS committed: it is the Vercel deployment's data source (cap 8 MB, enforced by tests)
+
+# frontend build + test output
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/

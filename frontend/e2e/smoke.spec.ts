@@ -10,7 +10,7 @@ test("atlas renders offline, map has every state, region opens a record", async 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /Bust Atlas/ })).toBeVisible();
   const states = page.locator("svg.map path.state");
-  await expect(states).toHaveCount(35);
+  await expect(states).toHaveCount(36);
   await page.locator("svg.map path.state[data-region='central']").first().dispatchEvent("click");
   await expect(page.getByRole("heading", { name: "Central India" })).toBeVisible();
   await expect(page.getByText(/bust rate/)).toBeVisible();
@@ -18,7 +18,7 @@ test("atlas renders offline, map has every state, region opens a record", async 
 
 test("today mode shows a forecaster's note and evidence has a reliability diagram", async ({ page }) => {
   await page.goto("/?mode=today&lead=6");
-  await expect(page.locator("svg.map path.state")).toHaveCount(35);
+  await expect(page.locator("svg.map path.state")).toHaveCount(36);
   await page.locator("svg.map path.state[data-region='north_west']").first().dispatchEvent("click");
   await expect(page.getByRole("heading", { name: "Forecaster's note" })).toBeVisible();
   await expect(page.locator(".note p")).toHaveCount(3);

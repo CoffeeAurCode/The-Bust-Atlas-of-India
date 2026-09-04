@@ -20,7 +20,7 @@ const H = 820;
 
 export function IndiaMap({ geo, meta, values, selected, onSelect, showLabels = true }: Props) {
   const ref = useRef<SVGSVGElement>(null);
-  const [tip, setTip] = useState<{ x: number; y: number; region: string } | null>(null);
+  const [tip, setTip] = useState<{ x: number; y: number; region: string; state?: string } | null>(null);
   const [themeTick, setThemeTick] = useState(0);
 
   // Re-read the ramp when the theme flips.
@@ -54,11 +54,14 @@ export function IndiaMap({ geo, meta, values, selected, onSelect, showLabels = t
 
   const seaRegions = meta.regions.filter((r) => r.id === "bay_of_bengal");
 
-  const onMove = (e: React.MouseEvent, region: string) => {
+  const onMove = (e: React.MouseEvent, region: string, state?: string) => {
     const rect = ref.current?.getBoundingClientRect();
     if (!rect) return;
-    setTip({ x: e.clientX - rect.left, y: e.clientY - rect.top, region });
+    setTip({ x: e.clientX - rect.left, y: e.clientY - rect.top, region, state });
   };
+  // Every state of the hovered region lights up together, so it is obvious that the
+  // forecast unit is the region box and not the individual state.
+  const hovered = tip?.region ?? null;
 
   return (
     <div className="mapwrap">
@@ -73,7 +76,7 @@ export function IndiaMap({ geo, meta, values, selected, onSelect, showLabels = t
         {seaRegions.map((r) => {
           const v = values[r.id];
           return (
-            <path key={r.id} className={`sea-region${selected === r.id ? " is-selected" : ""}`}
+            <path key={r.id} className={`sea-region${selected === r.id ? " is-selected" : ""}${hovered === r.id ? " is-hover" : ""}`}
                   d={boxPath(r.box)} fill={v ? ramp(v.t) : "var(--land)"} fillOpacity={0.55}
                   onMouseMove={(e) => onMove(e, r.id)} onClick={() => onSelect(selected === r.id ? null : r.id)} />
           );
@@ -85,11 +88,13 @@ export function IndiaMap({ geo, meta, values, selected, onSelect, showLabels = t
             const d = path(f as never) ?? "";
             return (
               <g key={f.properties.name}>
-                <path className={`state${region && selected === region ? " is-selected" : ""}`}
+                <path className={`state${region && selected === region ? " is-selected" : ""}${region && hovered === region ? " is-hover" : ""}`}
                       d={d} fill={v ? ramp(v.t) : "var(--land)"}
-                      onMouseMove={(e) => region && onMove(e, region)}
+                      onMouseMove={(e) => region && onMove(e, region, f.properties.name)}
                       onClick={() => region && onSelect(selected === region ? null : region)}
-                      data-region={region ?? undefined} />
+                      data-region={region ?? undefined}>
+                  <title>{f.properties.name}{region ? ` - ${regionMeta[region]?.label ?? region}` : ""}</title>
+                </path>
                 {v?.flag && <path className="flag" d={d} />}
               </g>
             );
@@ -113,9 +118,11 @@ export function IndiaMap({ geo, meta, values, selected, onSelect, showLabels = t
       </svg>
       {tip && (
         <div className="tip" style={{ left: tip.x, top: tip.y }} role="tooltip">
+          {tip.state && <div className="tip__state">{tip.state}</div>}
           <b>{regionMeta[tip.region]?.label ?? tip.region}</b>
           {values[tip.region] && <div className="num">{values[tip.region].label}{values[tip.region].detail ? ` ${values[tip.region].detail}` : ""}</div>}
           {values[tip.region]?.flag && <div>Flagged unreliable</div>}
+          <div className="tip__hint">click to open the region record</div>
         </div>
       )}
     </div>

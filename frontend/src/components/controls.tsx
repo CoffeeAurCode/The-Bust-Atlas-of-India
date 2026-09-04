@@ -15,7 +15,7 @@ export function Segmented<T extends string>({ options, value, onChange, label }:
   );
 }
 
-export function LeadSlider({ value, onChange, leads }: { value: number; onChange: (v: number) => void; leads: number[] }) {
+export function LeadSlider({ value, onChange, leads, validFor }: { value: number; onChange: (v: number) => void; leads: number[]; validFor?: string }) {
   const id = useId();
   const min = Math.min(...leads);
   const max = Math.max(...leads);
@@ -30,6 +30,12 @@ export function LeadSlider({ value, onChange, leads }: { value: number; onChange
           <div className="lead__ticks" aria-hidden="true">{leads.map((l) => <span key={l}>{l}</span>)}</div>
         </div>
       </div>
+      {/* Lead time is the one bit of jargon a non-forecaster trips on, so it is spelled
+          out next to the control rather than hidden in a method note. */}
+      <p className="lead__hint">
+        How far ahead the forecast reaches. Day {value} was issued {value} day{value === 1 ? "" : "s"} before the weather it describes
+        {validFor ? <>, so it is the forecast for <b>{validFor}</b></> : null}. Longer lead, less certainty.
+      </p>
     </div>
   );
 }

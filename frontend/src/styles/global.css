@@ -72,6 +72,8 @@ a { color: inherit; }
 .lead__val { font-family: var(--font-mono); font-size: 13px; min-width: 52px; }
 .lead input[type="range"] { width: 100%; accent-color: var(--accent); }
 .lead__ticks { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; color: var(--muted); padding: 0 2px; }
+.lead__hint { margin: 6px 0 0; max-width: 340px; font-size: 11.5px; line-height: 1.45; color: var(--muted); }
+.lead__hint b { color: var(--ink); font-weight: 500; }
 
 .datepick { display: flex; align-items: center; gap: 6px; }
 .datepick input { padding: 5px 8px; border: 1px solid var(--hair); border-radius: var(--radius); background: var(--surface); font-family: var(--font-mono); font-size: 13px; }
@@ -82,10 +84,12 @@ a { color: inherit; }
 .map path.state { stroke: var(--bg); stroke-width: 0.6; transition: fill 0.5s var(--ease), stroke-width 0.15s; cursor: pointer; }
 .map path.state:hover { stroke: var(--ink); stroke-width: 1.2; }
 .map path.state.is-selected { stroke: var(--ink); stroke-width: 1.5; }
+/* Hovering any state lights its whole region, so the forecast unit reads as the box. */
+.map path.state.is-hover { stroke: var(--ink); stroke-width: 1.1; stroke-opacity: 0.75; }
 .map .rbox { fill: none; stroke: var(--ink); stroke-opacity: 0.22; stroke-width: 0.7; stroke-dasharray: 3 3; pointer-events: none; }
 .map .rbox.is-selected { stroke-opacity: 0.9; stroke-dasharray: none; stroke-width: 1.2; }
 .map .sea-region { stroke: var(--ink); stroke-opacity: 0.25; stroke-width: 0.7; stroke-dasharray: 3 3; cursor: pointer; transition: fill 0.5s var(--ease); }
-.map .sea-region:hover, .map .sea-region.is-selected { stroke-opacity: 0.9; stroke-dasharray: none; }
+.map .sea-region:hover, .map .sea-region.is-selected, .map .sea-region.is-hover { stroke-opacity: 0.9; stroke-dasharray: none; }
 .map .flag { fill: url(#hatch); pointer-events: none; }
 .map .rlabel { font-family: var(--font-ui); font-size: 15px; font-weight: 500; fill: var(--ink); fill-opacity: 0.85; pointer-events: none; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
 .map .rlabel .val { font-family: var(--font-mono); font-size: 14px; font-weight: 400; }
@@ -93,6 +97,8 @@ a { color: inherit; }
 .tip { position: absolute; pointer-events: none; z-index: 5; background: var(--ink); color: var(--bg); padding: 8px 10px; border-radius: var(--radius); font-size: 12px; line-height: 1.35; box-shadow: var(--shadow); max-width: 240px; transform: translate(12px, 12px); }
 .tip b { font-weight: 500; }
 .tip .num { opacity: 0.85; }
+.tip__state { font-family: var(--font-ui); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.6; margin-bottom: 2px; }
+.tip__hint { margin-top: 4px; font-size: 11px; opacity: 0.55; }
 
 .legend { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
 .legend__ramp { display: flex; align-items: center; gap: 8px; }

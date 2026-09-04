@@ -8,6 +8,15 @@ import { probToT } from "../data/scale";
 import { BAND_LABEL, fmtInit, forecasterNote, pct, seasonOf } from "../data/text";
 import type { Source, UrlState } from "../state/url";
 
+/** The calendar day a Day-N forecast is about: issue date plus N days. This is what
+ *  "lead time" means, and showing it is cheaper than explaining it twice. */
+function validDate(init: string, lead: number): string {
+  const d = new Date(`${init.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return "";
+  d.setUTCDate(d.getUTCDate() + lead);
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+}
+
 /** Archive predictions and the live run carry the same per-region lead arrays. */
 type Regions = Prediction["regions"];
 
@@ -88,7 +97,8 @@ export function TodayMode({ meta, geo, inits, state, update }: { meta: Meta; geo
           {isLive
             ? <div className="toolbar__group"><span className="label">Run</span><span className="badge">{fmtInit(live!.init)}</span></div>
             : <DatePicker inits={inits} value={init} onChange={(i) => update({ init: i })} />}
-          <LeadSlider leads={meta.leads} value={state.lead} onChange={(lead) => update({ lead })} />
+          <LeadSlider leads={meta.leads} value={state.lead} onChange={(lead) => update({ lead })}
+                      validFor={validDate(shownInit, state.lead)} />
           <div className="toolbar__group">
             <span className="label">Ensemble</span>
             {isLive ? (

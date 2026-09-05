@@ -186,7 +186,7 @@ npm run dev                 # localhost:5173
 npm run typecheck && npm test && npm run build && npm run e2e
 ```
 
-The heavy extraction runs once in Colab (`notebooks/01-extract-region-stats.ipynb`, 15 to 30 min) and produces a small Parquet of per-region ensemble statistics. Everything after that runs on a laptop, offline. `npm run preview` serves the whole app with the network unplugged.
+The heavy extraction runs once in Colab (`notebooks/01-extract-region-stats.ipynb`, about 5 minutes per year of archive) and produces a small Parquet of per-region ensemble statistics. It writes the result to Google Drive at `MyDrive/vishwas/`, not through the browser: `google.colab.files.download()` is a silent no-op when the notebook is driven from VS Code rather than a real Colab tab. Everything after that runs on a laptop, offline. `npm run preview` serves the whole app with the network unplugged.
 
 ## Data
 

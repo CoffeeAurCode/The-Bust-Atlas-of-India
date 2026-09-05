@@ -11,12 +11,16 @@ Usage (Colab):
     !python extract_region_stats.py --source ifs_ens --years 2020 2021 2022 --out /content/out
 
 Resumable: checkpoints every --checkpoint groups into <out>/<source>_z500_boxstats.parts/,
-and the final file is the concatenation. Re-running skips finished parts.
+and the final file is the concatenation. Re-running skips finished parts. Parts are keyed
+by group index only, so a manifest.json records the run's settings and the parts are
+discarded if --years (or --leads, --group, --checkpoint) changed; otherwise a resume would
+quietly graft one year's data onto another's.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 import time as _time
 from pathlib import Path
@@ -131,6 +135,24 @@ def main() -> None:
     parts_dir = out_dir / f"{args.source}_z500_boxstats.parts"
     parts_dir.mkdir(parents=True, exist_ok=True)
     final = out_dir / f"{args.source}_z500_boxstats.parquet"
+
+    # Checkpoint parts are named by group index alone, so a part written by a run over
+    # different years would be silently reused for a completely different set of inits:
+    # change --years, resume, and the output mixes the two without any error. Stamp the
+    # run's identity next to the parts and discard the lot when it does not match.
+    manifest = parts_dir / "manifest.json"
+    ident = {"source": args.source, "years": sorted(args.years),
+             "leads": list(args.leads), "group": args.group, "checkpoint": args.checkpoint}
+    if manifest.exists():
+        prev = json.loads(manifest.read_text(encoding="utf-8"))
+        if prev != ident:
+            stale = list(parts_dir.glob("part-*.parquet"))
+            print(f"[resume] settings changed since the last run, discarding {len(stale)} stale part(s)")
+            print(f"         was {prev}")
+            print(f"         now {ident}")
+            for p in stale:
+                p.unlink()
+    manifest.write_text(json.dumps(ident), encoding="utf-8")
 
     t0 = _time.time()
     print(f"[open] {src['path']}")
